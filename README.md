@@ -20,3 +20,18 @@
 - Use 2012 data as the test set instead of random split
 - Setup deep learning model
 - More extensive EDA/Testing
+
+
+# Write UP
+This project aims to predict the migration of animals in the reserve forests and wildlife sanctuaries of Mozambique, in East Africa.
+
+Data has been collected from 1969 in various time intervals.
+
+We have compared many potential solutions to predict these values including Deep Learning and Non Deep Learning approaches such as.
+
+In this repository we bring forth our best models - RandomForest Regressor, Long Short Term Memory Neural Networks, and an Ensemble of various fully connected neural networks.
+
+## Data Science Pipelines
+
+1. 
+
