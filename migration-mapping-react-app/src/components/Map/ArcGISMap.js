@@ -8,7 +8,7 @@ import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer';
 import Graphic from '@arcgis/core/Graphic';
 import Point from '@arcgis/core/geometry/Point';
 
-const ArcGISMap = ({ onTimeChange }) => {
+const ArcGISMap = ({ locationData, onTimeChange = () => {}  }) => {
     const mapDiv = useRef(null);
     const view = useRef(null);
     const timeSliderContainer = useRef(null);
@@ -43,17 +43,10 @@ const ArcGISMap = ({ onTimeChange }) => {
         map.add(graphicsLayer);
         graphicsLayerRef.current = graphicsLayer;
 
-        // Sample data from your CSV
-        const locationData = [
-            { id: 1, month: 10, year: 1969, latitude: -18.25455, longitude: 34.64503 },
-            { id: 2, month: 10, year: 1969, latitude: -18.27515, longitude: 34.58535 },
-            { id: 3, month: 10, year: 1969, latitude: -18.28297, longitude: 34.63437 },
-            { id: 4, month: 10, year: 1969, latitude: -18.30073, longitude: 34.53490 },
-            { id: 5, month: 10, year: 1969, latitude: -18.29150, longitude: 34.56261 },
-            { id: 6, month: 10, year: 1969, latitude: -18.29931, longitude: 34.57469 }
-        ].map(point => ({
+
+        // Prepare location data with timestamps
+        const processedLocationData = locationData.map(point => ({
             ...point,
-            // Create Date object for each point (setting to first day of month for demo)
             timestamp: new Date(point.year, point.month - 1, 1)
         }));
 
@@ -90,12 +83,12 @@ const ArcGISMap = ({ onTimeChange }) => {
             return data.map(point => {
             return new Graphic({
                 geometry: new Point({
-                longitude: point.longitude,
-                latitude: point.latitude
+                longitude: point.LONGITUDE,
+                latitude: point.LATITUDE
                 }),
                 attributes: {
-                ObjectId: point.id,
-                timestamp: point.timestamp.getTime()
+                ObjectId: point.ID,
+                // timestamp: point.timestamp.getTime()
                 },
                 symbol: {
                 type: "simple-marker",
@@ -134,7 +127,7 @@ const ArcGISMap = ({ onTimeChange }) => {
         };
 
         // Add initial graphics
-        const locationGraphics = createGraphics(locationData);
+        const locationGraphics = createGraphics(processedLocationData);
         graphicsLayer.graphics.addMany(locationGraphics);
 
         const timeSliderContainer = document.createElement('div');
@@ -174,7 +167,7 @@ const ArcGISMap = ({ onTimeChange }) => {
                 point.timestamp <= timeExtent.end
             );
 
-            graphicsLayer.graphics.addMany(createGraphics(filteredData));
+            graphicsLayer.graphics.addMany(createGraphics(processedLocationData));
 
             // Call time change callback
             onTimeChange({
@@ -193,7 +186,7 @@ const ArcGISMap = ({ onTimeChange }) => {
                 timeSlider.destroy();
             }
         };
-    }, [onTimeChange]);
+    }, [locationData, onTimeChange]);
 
     return (
         <div className="map-container h-full w-full">
