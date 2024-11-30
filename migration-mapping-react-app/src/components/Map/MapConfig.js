@@ -1,7 +1,7 @@
 export const MAP_CONFIG = {
     basemap: 'topo-vector',
-    center: [-100, 40],
-    zoom: 4,
+    center: [34.58, -18.28],
+    zoom: 11,
     timeInfo: {
         startField: "START_TIME",
         endField: "END_TIME",
