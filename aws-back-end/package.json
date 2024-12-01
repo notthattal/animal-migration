@@ -1,0 +1,8 @@
+{
+  "name": "aws-back-end",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "sam build",
+    "deploy": "sam deploy --template-file .aws-sam/build/template.yaml --stack-name aws-back-end --capabilities CAPABILITY_IAM --s3-bucket aws-sam-deploy-$(aws sts get-caller-identity --query 'Account' --output text) --no-fail-on-empty-changeset"
+  }
+}

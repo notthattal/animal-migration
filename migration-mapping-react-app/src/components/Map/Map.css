@@ -1,0 +1,29 @@
+.esri-time-slider {
+    width: 80%;  /* Use percentage for responsive width */
+    margin: 0 auto 20px auto; /* Add bottom margin for spacing */
+    position: absolute;
+    left: 50%;
+    bottom: 20px; /* Adjust spacing from bottom */
+    transform: translateX(-50%); /* Center horizontally */
+    z-index: 1000;
+  }
+  
+  .esri-time-slider__container {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+    padding: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Ensure slider track fills container width */
+  .esri-time-slider__slider {
+    width: 100%;
+    margin: 8px 0;
+  }
+  
+  /* Adjust time labels for better visibility */
+  .esri-time-slider__time-extent {
+    font-size: 12px;
+    margin: 4px 0;
+  }
+  

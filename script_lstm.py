@@ -1,12 +1,8 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from datetime import datetime, time
+from datetime import datetime
 from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error
-from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import StandardScaler
-import random
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 import torch.nn as nn
@@ -18,14 +14,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-device_name = "cpu"
-if torch.cuda.is_available():
-    device_name = "cuda"
-elif torch.backends.mps.is_available():
-    #device_name = "mps"
-    print("For Tal to Test")
-print(f"Using Device: {device_name}")
-device = torch.device(device_name)
+device = torch.device("cpu")
 
 def process_date(val):
     if pd.isna(val):
