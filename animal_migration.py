@@ -1,16 +1,9 @@
 import numpy as np
 import pandas as pd
-from datetime import datetime
-from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error
-from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import GradientBoostingRegressor
-import random
-import torch
-from torch.utils.data import DataLoader, TensorDataset
-import torch.nn as nn
 from non_dl import clean_df, train_gb_model
 from script_lstm import final_train, final_predict
+from sklearn.preprocessing import LabelEncoder
 
 def get_future_predictions(df, models, last_year=2022):
     past_year = df[df['COUNT'] == last_year].copy()
@@ -144,7 +137,7 @@ def main():
     print('Successfully trained non-dl model')
 
     last_year = 2022
-    num_years = 2030 - last_year
+    num_years = 2023 - last_year
     if num_years == 1:
         print(f'Producing predictions for: {last_year + 1}')
     else:
@@ -155,6 +148,14 @@ def main():
 
     predictions_from_2023 = predicted_df[predicted_df['COUNT'] >= 2023]
     output_df = pd.concat([cleaned_df, predictions_from_2023], ignore_index=True)
+
+    le = LabelEncoder()
+    species_columns = [col for col in output_df.columns if col.startswith('SPECIES_')]
+
+    # Combine back into one column
+    output_df['SPECIES'] = output_df[species_columns].idxmax(axis=1).str.replace('SPECIES_', '')
+    output_df['SPECIES'] = le.fit_transform(output_df['SPECIES'])
+    output_df = output_df[['ID', 'COUNT', 'MONTH', 'DATE', 'TIME', 'NUMBER', 'LATITUDE', 'LONGITUDE', 'SPECIES']]
 
     print('Outputting to CSV')
     output_df.to_csv('animal_migration.csv')
