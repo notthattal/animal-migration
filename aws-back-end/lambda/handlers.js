@@ -87,8 +87,32 @@ exports.messageHandler = async (event) => {
                     id: values[1],
                     year: parseInt(values[2]), // COUNT column
                     month: parseInt(values[3]),
+                    date: values[4],
+                    time: values[5],
                     latitude: parseFloat(values[9]),
-                    longitude: parseFloat(values[10])
+                    longitude: parseFloat(values[10]),
+                    number: parseInt(values[13]),
+                    species: {
+                        blueWildebeest: values[24] === 'True',
+                        buffalo: values[25] === 'True',
+                        bushbuck: values[26] === 'True',
+                        bushpig: values[27] === 'True',
+                        commonReedbuck: values[28] === 'True',
+                        duikerGrey: values[29] === 'True',
+                        duikerRed: values[30] === 'True',
+                        eland: values[31] === 'True',
+                        elephant: values[32] === 'True',
+                        hartebeest: values[33] === 'True',
+                        hippo: values[34] === 'True',
+                        impala: values[35] === 'True',
+                        kudu: values[36] === 'True',
+                        nyala: values[37] === 'True',
+                        oribi: values[38] === 'True',
+                        sable: values[39] === 'True',
+                        warthog: values[40] === 'True',
+                        waterbuck: values[41] === 'True',
+                        zebra: values[42] === 'True'
+                    }
                 };
             })
             .filter(record => {
