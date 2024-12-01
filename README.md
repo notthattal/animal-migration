@@ -1,7 +1,7 @@
 # Mozambique Animal Migration
 This project aims to predict the migration of animals in the reserve forests and wildlife sanctuaries of Mozambique, in East Africa.
 
-Done by Ahmed Boutar, Tal Erez, Lennox Anderson, and Vihaan Nama
+Done by Ahmed Boutar, Tal Erez, Vihaan Nama, and Lennox Anderson
 
 Data has been collected from 1969 in various time intervals.
 
