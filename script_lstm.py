@@ -18,14 +18,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-device_name = "cpu"
-if torch.cuda.is_available():
-    device_name = "cuda"
-elif torch.backends.mps.is_available():
-    #device_name = "mps"
-    print("For Tal to Test")
-print(f"Using Device: {device_name}")
-device = torch.device(device_name)
+device = torch.device("cpu")
 
 def process_date(val):
     if pd.isna(val):

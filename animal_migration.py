@@ -98,6 +98,7 @@ def get_predictions_for_mult_yrs(df, models, num_years_to_pred=1, last_year=2022
     out_df = df.copy()
     next_year = last_year
     for i in range(num_years_to_pred):
+        print(f'Generating predictions for year: {next_year + 1}')
         out_df = get_future_predictions(out_df, models, next_year)
         next_year += 1
     
@@ -143,7 +144,7 @@ def main():
     print('Successfully trained non-dl model')
 
     last_year = 2022
-    num_years = 1
+    num_years = 2030 - last_year
     if num_years == 1:
         print(f'Producing predictions for: {last_year + 1}')
     else:
