@@ -10,6 +10,7 @@ import torch
 from torch.utils.data import DataLoader, TensorDataset
 import torch.nn as nn
 from non_dl import clean_df, train_gb_model
+from script_lstm import final_train, final_predict
 
 def get_future_predictions(df, models, last_year=2022):
     past_year = df[df['COUNT'] == last_year].copy()
@@ -75,8 +76,7 @@ def get_future_predictions(df, models, last_year=2022):
             curr_row_df = row.to_frame().T 
             curr_row = curr_row_df.drop(columns=['ID', 'timestamp', 'species', 'LATITUDE', 'LONGITUDE', 'NUMBER'])
             
-            num_row_scaled = models['num_model'][1].transform(curr_row)
-            num_pred = models['num_model'][0].predict(num_row_scaled)
+            num_pred = final_predict(models['num_model'][0], models['num_model'][1], curr_row)
 
             lat_row_scaled = models['lat_model'][1].transform(curr_row)
             lat_pred = models['lat_model'][0].predict(lat_row_scaled)
@@ -84,7 +84,7 @@ def get_future_predictions(df, models, last_year=2022):
             long_row_scaled = models['long_model'][1].transform(curr_row)
             long_pred = models['long_model'][0].predict(long_row_scaled)
             
-            row['NUMBER'] = np.round(num_pred[0])
+            row['NUMBER'] = np.round(num_pred)
             row['LATITUDE'] = lat_pred[0]
             row['LONGITUDE'] = long_pred[0]
 
@@ -119,12 +119,13 @@ def main():
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
 
-    print('Starting non-dl model training')
-
+    print('Starting dl model training')
     print('Training number model')
-    num_model = train_gb_model(X_train, y_train=train_df['NUMBER'])
+    num_model, num_scaler = final_train(train_df, ['NUMBER'])
     print('Number model training complete')
+    print('Successfully trained dl model')
 
+    print('Starting non-dl model training')
     print('Training latitude model')
     lat_model = train_gb_model(X_train, y_train=train_df['LATITUDE'])
     print('Latitude model training complete')
@@ -134,7 +135,7 @@ def main():
     print('Longitude model training complete')
 
     trained_models = {
-        'num_model': [num_model, scaler],
+        'num_model': [num_model, num_scaler],
         'lat_model': [lat_model, scaler],
         'long_model': [long_model, scaler]
     }
