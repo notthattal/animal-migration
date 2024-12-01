@@ -81,7 +81,7 @@ def run_cv(df, train_drop, pred_col, num_splits=5):
         X_test = scaler.transform(X_test)
 
         # Multi-output regressor
-        model = GradientBoostingRegressor()
+        model = GradientBoostingRegressor(max_depth=3, min_samples_leaf=2, min_samples_split=5, n_estimators=500)
         model.fit(X_train, y_train)
 
         # Predictions
@@ -110,6 +110,6 @@ def get_predictions(model, X_test, y_test=None):
     return y_pred
 
 def train_gb_model(X_train, y_train):
-    model = GradientBoostingRegressor()
+    model = GradientBoostingRegressor(max_depth=3, min_samples_leaf=2, min_samples_split=5, n_estimators=500)
     model.fit(X_train, y_train)
     return model
