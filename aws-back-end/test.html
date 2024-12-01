@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test</title>
+    <style>
+        #log { margin: 10px; padding: 10px; border: 1px solid #ccc; height: 300px; overflow-y: auto; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+<h2>WebSocket Test</h2>
+<div id="log"></div>
+<button onclick="sendTestMessage()" id="sendBtn" disabled>Send Test Message</button>
+
+<script>
+    // Get your WebSocket URL from CloudFormation outputs
+    const ws = new WebSocket('wss://i4zknw04kh.execute-api.us-east-1.amazonaws.com/prod');
+
+    function log(msg, isError = false) {
+        const div = document.createElement('div');
+        div.textContent = new Date().toISOString() + ': ' + msg;
+        div.className = isError ? 'error' : 'success';
+        document.getElementById('log').insertBefore(div, document.getElementById('log').firstChild);
+        console.log(msg);
+    }
+
+    ws.onopen = () => {
+        log('Connected to WebSocket');
+        document.getElementById('sendBtn').disabled = false;
+    };
+
+    ws.onclose = () => {
+        log('Disconnected from WebSocket', true);
+        document.getElementById('sendBtn').disabled = true;
+    };
+
+    ws.onerror = (error) => {
+        log('WebSocket error: ' + JSON.stringify(error), true);
+    };
+
+    ws.onmessage = (event) => {
+        log('Received message: ' + event.data);
+    };
+
+    function sendTestMessage() {
+        const message = {
+            action: 'sendmessage',
+            startYear: 1969,
+            startMonth: 10,
+            endYear: 1969,
+            endMonth: 11
+        };
+        ws.send(JSON.stringify(message));
+        log('Sent message: ' + JSON.stringify(message));
+    }
+</script>
+</body>
+</html>
