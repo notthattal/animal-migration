@@ -7,68 +7,104 @@ import { Menu, Filter, MapPin, X } from 'lucide-react';
 
 const ApplicationPage = () => {
     const [timeExtent, setTimeExtent] = useState(null);
+    const [timeRange, setTimeRange] = useState(null);
     const [locationData, setLocationData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [filtersVisible, setFiltersVisible] = useState(false);
     const [appliedFilters, setAppliedFilters] = useState({});
+    const [filteredLocationData, setFilteredLocationData] = useState([]);
+
     
     const handleFilterChange = (newFilters) => {
-        setAppliedFilters(newFilters);
-        // TODO: Implement filter logic for map layer
-        const startDate = newFilters.startDate;
-        const endDate = newFilters.endDate;
+        // // Call handleTimeChange with the date range
         
-        // Call handleTimeChange with the date range
+        setAppliedFilters(newFilters);
+        const startDate = new Date(newFilters.startDate);
+        const endDate = new Date(newFilters.endDate);
+
         if (startDate && endDate) {
             handleTimeChange({ start: startDate, end: endDate });
+            setTimeRange({ start: startDate, end: endDate })
         }
+
+        // Filter the data based on date range
+        const filteredData = locationData.filter(point => {
+            const pointDate = new Date(point.fullDate);
+            return pointDate >= startDate && pointDate <= endDate;
+        });
+
+        console.log('startDate: ', startDate)
+        console.log('endDate: ', endDate)
+
+        // Update the map with filtered data
+        setFilteredLocationData(filteredData);
       };
       
     const toggleSidebar = () => {
         setFiltersVisible(!filtersVisible);
       };
+
+    // Helper function to convert seconds after midnight to hours, minutes, seconds
+    const getTimeFromSeconds = (secondsAfterMidnight) => {
+        const hours = Math.floor(secondsAfterMidnight / 3600);
+        const minutes = Math.floor((secondsAfterMidnight % 3600) / 60);
+        const seconds = secondsAfterMidnight % 60;
+        return { hours, minutes, seconds };
+    };
+
     useEffect(() => {
         const loadCSVData = async () => {
             try {
                 const response = await fetch('/data/animals.csv');
                 const csvText = await response.text();
-                
-                
 
                 Papa.parse(csvText, {
                     header: true,
                     dynamicTyping: true,
                     complete: (results) => {
-                        // results.data.slice(0, 10).map((point, index) => {
-                        //     return {
-                        //         ...point,
-                        //         id: index + 1, // Example transformation
-                        //     };
-                        // });
-                        const processedData = results.data.slice(5000, 12000).map((point, index) => ({
-                        ...point,
-                        id: point.ID || index + 1,
-                        month: Number(point.MONTH),
-                        year: Number(point.COUNT),
-                        latitude: Number(point.LATITUDE),
-                        longitude: Number(point.LONGITUDE),
-                        fullDate: new Date(
-                            Number(point.COUNT), // year
-                            Number(point.MONTH) - 1, // month (0-indexed)
-                            typeof point.DATE == 'string' ? Number(point.DATE.split('/')[1]) : Number(point.DATE),
-                            typeof point.TIME == 'string' ? Number(point.TIME.split(':')[0]) : Number(point.TIME),
-                            typeof point.TIME == 'string' ? Number(point.TIME.split(':')[1]) : Number(point.TIME)
+                        // const processedData = results.data.slice(5000, 12000).map((point, index) => ({
+                        // ...point,
+                        // id: point.ID || index + 1,
+                        // month: Number(point.MONTH),
+                        // year: Number(point.COUNT),
+                        // latitude: Number(point.LATITUDE),
+                        // longitude: Number(point.LONGITUDE),
+                        // fullDate: new Date(
+                        //     Number(point.COUNT), // year
+                        //     Number(point.MONTH) - 1, // month (0-indexed)
+                        //     // typeof point.DATE == 'string' ? Number(point.DATE.split('/')[1]) : Number(point.DATE),
+                        //     point.DATE? Number(point.DATE): null,
+                        //     // typeof point.TIME == 'string' ? Number(point.TIME.split(':')[0]) : Number(point.TIME),
+                        //     // typeof point.TIME == 'string' ? Number(point.TIME.split(':')[1]) : Number(point.TIME)
                            
-                        ),
-                        }))// Sort data chronologically
-                        .sort((a, b) => a.fullDate - b.fullDate)
-                        // .filter(point => 
-                        // !isNaN(point.latitude) && 
-                        // !isNaN(point.longitude) && 
-                        // point.month && 
-                        // point.year
-                        // );
+                        // ),
+                        // }))// Sort data chronologically
+                        // .sort((a, b) => a.fullDate - b.fullDate)
+                        // Update the data processing
+                        const processedData = results.data.map((point, index) => {
+                            // Convert time from seconds after midnight
+                            const timeOfDay = point.TIME ? getTimeFromSeconds(Number(point.TIME)) : { hours: 0, minutes: 0, seconds: 0 };
+                            
+                            return {
+                                ...point,
+                                id: point.ID || index + 1,
+                                month: Number(point.MONTH),
+                                year: Number(point.COUNT),
+                                latitude: Number(point.LATITUDE),
+                                longitude: Number(point.LONGITUDE),
+                                fullDate: new Date(
+                                    Number(point.COUNT), // year
+                                    Number(point.MONTH) - 1, // month (0-indexed)
+                                    point.DATE ? Number(point.DATE) : 1, // day
+                                    timeOfDay.hours,
+                                    timeOfDay.minutes,
+                                    timeOfDay.seconds
+                                )
+                            };
+                        })
+                        .sort((a, b) => a.fullDate - b.fullDate);
+                        
                         setLocationData(processedData);
                         setIsLoading(false);
                     },
@@ -93,6 +129,7 @@ const ApplicationPage = () => {
     // Function to handle time changes from the TimeSlider
     const handleTimeChange = async (timeRange) => {
         try {
+            console.log('handleTimeChange today: ', timeRange)
             // // Fetch data based on the time range
             // const response = await fetch('/api/wildlife-data', {
             //     method: 'POST',
@@ -154,8 +191,9 @@ const ApplicationPage = () => {
           {/* Map */}
           <div className="flex-1 overflow-hidden">
             <ArcGISMap
-              locationData={locationData}
-              onTimeChange={handleTimeChange}
+              locationData={filteredLocationData.length > 0 ? filteredLocationData : locationData}
+              timeRange={timeRange}
+             
             />
           </div>
         </div>

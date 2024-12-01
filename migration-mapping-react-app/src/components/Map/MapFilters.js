@@ -28,6 +28,7 @@ const SidebarFilters = ({ onFilterChange }) => {
         startDate: dateRange.start,
         endDate: dateRange.end
       });
+      
     };
   
     return (
