@@ -1,20 +1,54 @@
-// ArcGISMap.js
-import React, { useEffect, useRef } from 'react';
+// export default ArcGISMap;
+import React, { useEffect, useRef, useState } from 'react';
 import Map from '@arcgis/core/Map';
 import MapView from '@arcgis/core/views/MapView';
 import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer';
 import Graphic from '@arcgis/core/Graphic';
 import Point from '@arcgis/core/geometry/Point';
+import { MAP_CONFIG } from './MapConfig';
+import DataProcessor from './DataProcessor';
 import TimeSlider from '@arcgis/core/widgets/TimeSlider';
-import Circle from "@arcgis/core/geometry/Circle";
+import './Map.css'
 
 const ArcGISMap = ({ locationData, timeRange }) => {
     const mapDiv = useRef(null);
     const view = useRef(null);
     const graphicsLayerRef = useRef(null);
-    const timeSliderRef = useRef(null);
+    const animationRef = useRef(null); // Ref to handle animation control
+    const isPlayingRef = useRef(false);
+    const currentIndexRef = useRef(0);
+    const [customStops, setCustomStops] = useState([]);
+    const [animatedData, setAnimatedData] = useState([]);
 
-    // Initialize map
+    
+    const SPECIES_COLORS = {
+        'blueWildebeest': '#4F4F4F',    // Dark grey-blue
+        'buffalo': '#8B4513',           // Saddle brown
+        'bushbuck': '#8B7355',          // Light brown
+        'bushpig': '#FF9999',          // Pink-ish
+        'commonReedbuck': '#D2B48C',    // Tan
+        'duikerGrey': '#808080',        // Grey
+        'duikerRed': '#CD853F',         // Peru brown
+        'eland': '#DEB887',            // Burlywood
+        'elephant': '#696969',          // Dim grey
+        'hartebeest': '#B8860B',        // Dark golden rod
+        'hippo': '#778899',            // Light slate grey
+        'impala': '#CD853F',           // Peru brown
+        'kudu': '#A0522D',             // Sienna
+        'nyala': '#6B4423',            // Dark brown
+        'oribi': '#DAA520',            // Golden rod
+        'sable': '#2F4F4F',            // Dark slate grey
+        'warthog': '#8B7765',          // Rosy brown
+        'waterbuck': '#987654',        // Warm brown
+        'zebra': '#E5E4E2',            // Platinum (with hint of grey)
+        'default': '#FF0000'           // Red for unmatched species
+    };
+    
+    const getSpeciesColor = (species) => {
+      return SPECIES_COLORS[species] || SPECIES_COLORS['default'];
+    }
+
+
     useEffect(() => {
         const map = new Map({
             basemap: "dark-gray"
@@ -58,91 +92,41 @@ const ArcGISMap = ({ locationData, timeRange }) => {
         });
         graphicsLayer.add(parkBoundary);
 
-        return () => {
-            if (view.current) {
-                view.current.destroy();
-            }
-        };
-    }, []);
-
-    // Create density circles
-    const createDensityCircles = (points) => {
-        const gridSize = 0.01; // Approximately 1km grid
-        const grid = {};
-
-        // Group points into grid cells
-        points.forEach(point => {
-            const gridX = Math.floor(point.longitude / gridSize);
-            const gridY = Math.floor(point.latitude / gridSize);
-            const key = `${gridX},${gridY}`;
-
-            if (!grid[key]) {
-                grid[key] = {
-                    points: [],
-                    count: 0,
-                    totalNumber: 0
-                };
-            }
-            grid[key].points.push(point);
-            grid[key].count++;
-            grid[key].totalNumber += (point.number || 1);
-        });
-
-        // Create circles for each grid cell
-        return Object.entries(grid).map(([key, cell]) => {
-            // Calculate center of cell
-            const avgLon = cell.points.reduce((sum, p) => sum + p.longitude, 0) / cell.points.length;
-            const avgLat = cell.points.reduce((sum, p) => sum + p.latitude, 0) / cell.points.length;
-
-            // Scale opacity and size based on point density
-            const maxCount = 50; // Adjust this based on your data
-            const opacity = Math.min(cell.count / maxCount, 0.8);
-            const size = Math.min(cell.count * 100, 500); // Adjust size scaling
-
-            return new Graphic({
-                geometry: new Point({
-                    longitude: avgLon,
-                    latitude: avgLat
-                }),
-                symbol: {
-                    type: "simple-marker",
-                    style: "circle",
-                    color: [255, 0, 0, opacity],
-                    size: size,
-                    outline: null
-                },
-                attributes: {
-                    count: cell.count,
-                    totalAnimals: cell.totalNumber
-                },
-                popupTemplate: {
-                    title: "Wildlife Density",
-                    content: [
-                        {
-                            type: "text",
-                            text: `Sightings: ${cell.count}\nTotal Animals: ${cell.totalNumber}`
-                        }
-                    ]
-                }
+        // Function to create graphics from location data
+        const createGraphics = (data) =>
+            data.map((point) => {
+                return new Graphic({
+                    geometry: new Point({
+                        longitude: point.LONGITUDE,
+                        latitude: point.LATITUDE,
+                    }),
+                    attributes: {
+                        ObjectId: point.ID,
+                    },
+                    symbol: {
+                        type: "simple-marker",
+                        color: "#FF0000",
+                        size: 8,
+                        outline: {
+                            color: "white",
+                            width: 1,
+                        },
+                    },
+                });
             });
-        });
-    };
+        
+        const uniqueObservationDates = DataProcessor.getUniqueObservationDates(locationData);
+        setCustomStops(uniqueObservationDates.map(date => new Date(date)));
 
-    // Handle TimeSlider and data updates
-    useEffect(() => {
-        if (!view.current || !timeRange || !locationData.length) return;
-
-        if (timeSliderRef.current) {
-            view.current.ui.remove(timeSliderRef.current);
-        }
-
+        // Initialize TimeSlider
+        if(!timeRange) return;
         const timeSlider = new TimeSlider({
             container: "timeSlider",
-            view: view.current,
+            view: mapView,
             mode: "time-window",
             fullTimeExtent: {
                 start: timeRange.start,
-                end: timeRange.end
+                end:  timeRange.end
             },
             timeExtent: {
                 start: timeRange.start,
@@ -151,51 +135,186 @@ const ArcGISMap = ({ locationData, timeRange }) => {
             stops: {
                 interval: {
                     value: 1,
-                    unit: "hours"
-                }
+                    unit: "days",
+                },
+                // dates: customStops
             },
-            playRate: 500
+            layout: 'wide',
+            // playRate: 5000 // Adjust for animation speed
+    
+            
         });
 
-        timeSliderRef.current = timeSlider;
-        view.current.ui.add(timeSlider, "bottom-left");
+
+        mapView.ui.empty("bottom-right"); // Clear existing widgets
+        mapView.ui.add(timeSlider, {
+            position: "manual",
+            index: 1
+        });
+
+        const processedLocationData = locationData.map((point) => ({
+            ...point,
+            timestamp: new Date(point.year, point.month - 1, point.day || 1),
+        }));
+
+        // Animation control functions
+        const startAnimation = () => {
+            isPlayingRef.current = true;
+            animate();
+        };
+
+        const stopAnimation = () => {
+            isPlayingRef.current = false;
+            if (animationRef.current) {
+                cancelAnimationFrame(animationRef.current);
+                animationRef.current = null;
+            }
+        };
+
+        const toggleAnimation = () => {
+            if (isPlayingRef.current) {
+                stopAnimation();
+            } else {
+                startAnimation();
+            }
+        };
+
+        const getSpeciesName = (dataPoint) => {
+            const species = Object.keys(dataPoint['species']).filter(key => dataPoint['species'][key] === true);
+            
+            return species.length > 0 
+                ? species[0]
+                : 'Unknown';
+          }
+
+        
+        // Modified animate function to handle skips
+        const animate = () => {
+            if (!isPlayingRef.current) return;
+
+            const currentDate = timeSlider.timeExtent.start;
+            const endDate = timeSlider.fullTimeExtent.end;
+
+            if (currentDate < endDate) {
+                const nextDate = new Date(currentDate);
+                nextDate.setDate(nextDate.getDate() + 1);
+
+                // Find next date with data
+                const nextDataPoint = processedLocationData.find(point => {
+                    const pointDate = new Date(point.timestamp);
+                    return pointDate > currentDate && pointDate <= endDate;
+                });
+
+                if (nextDataPoint) {
+                    timeSlider.timeExtent = {
+                        start: new Date(nextDataPoint.timestamp),
+                        end: new Date(nextDataPoint.timestamp)
+                    };
+                } else {
+                    timeSlider.timeExtent = {
+                        start: nextDate,
+                        end: nextDate
+                    };
+                }
+
+                setTimeout(() => {
+                    animationRef.current = requestAnimationFrame(animate);
+                }, timeSlider.playRate);
+            } else {
+                stopAnimation();
+            }
+        };
+
+        const updateGraphics = (currentDate) => {
+            graphicsLayer.graphics.removeAll();
+            graphicsLayer.add(parkBoundary);
+        
+            // Find exact matches for the current date
+            const currentDateData = processedLocationData.filter(point => {
+                const pointDate = new Date(point.fullDate);
+                return pointDate.getFullYear() === currentDate.getFullYear() &&
+                       pointDate.getMonth() === currentDate.getMonth() &&
+                       pointDate.getDate() === currentDate.getDate();
+            });
+        
+            if (currentDateData.length > 0) {
+                const graphics = createGraphics(currentDateData);
+                graphicsLayer.graphics.addMany(graphics);
+            }
+        };
+
+        const animatePointsForDay = (dayData) => {
+            // Sort points by time of day
+            const sortedDayPoints = dayData.sort((a, b) => a.fullDate - b.fullDate);
+            
+            sortedDayPoints.forEach((point, index) => {
+                setTimeout(() => {
+                    const species = getSpeciesName(point);
+                    const graphic = new Graphic({
+                        geometry: new Point({
+                            longitude: point.longitude,
+                            latitude: point.latitude
+                        }),
+                        symbol: {
+                            type: "simple-marker",
+                            color: getSpeciesColor(species),
+                            size: point.number * 2, // Size based on animal count
+                            outline: {
+                                color: "white",
+                                width: 1
+                            }
+                        },
+                        attributes: {
+                            species: species,
+                            count: point.number
+                        }
+                    });
+
+                    graphicsLayer.add(graphic);
+
+                    // Remove point after an hour of display
+                    setTimeout(() => {
+                        graphicsLayer.remove(graphic);
+                    }, 1000); // 1 hour
+
+                }, index * 300); // 500ms between point displays
+            });
+        };
+
+        //  timeSlider.watch("timeExtent", (timeExtent) => {
+        //     if (timeExtent) {
+        //         updateGraphics(timeExtent.start);
+                
+        //     }
+            
+        // });
 
         timeSlider.watch("timeExtent", (timeExtent) => {
-            if (timeExtent) {
-                updateVisualization(timeExtent);
+            const currentDate = timeExtent.start;
+            const dayData = locationData.filter(point => 
+                isSameDay(point.fullDate, currentDate)
+            );
+
+            animatePointsForDay(dayData);
+        });
+
+        
+    
+    
+        return () => {
+            if (view.current) {
+                view.current.destroy();
+                view.current = null;
             }
-        });
+        };
 
-        // Initialize with first day's data
-        updateVisualization({
-            start: timeRange.start,
-            end: new Date(timeRange.start.getTime() + (24 * 60 * 60 * 1000))
-        });
+    }, [locationData]);
 
-    }, [timeRange, locationData]);
-
-    const updateVisualization = (timeExtent) => {
-        if (!graphicsLayerRef.current) return;
-
-        // Clear existing points but keep park boundary
-        const graphics = graphicsLayerRef.current.graphics.toArray();
-        const parkBoundary = graphics.find(g => g.geometry.type === "polygon");
-        graphicsLayerRef.current.graphics.removeAll();
-        if (parkBoundary) {
-            graphicsLayerRef.current.add(parkBoundary);
-        }
-
-        // Filter points for current time window
-        const currentPoints = locationData.filter(point => {
-            const pointDate = point.fullDate.getTime();
-            return pointDate >= timeExtent.start.getTime() &&
-                pointDate <= timeExtent.end.getTime();
-        });
-
-        // Create and add density circles
-        const densityCircles = createDensityCircles(currentPoints);
-        graphicsLayerRef.current.addMany(densityCircles);
-    };
+    const isSameDay = (date1, date2) => {
+        return date1.getFullYear() === date2.getFullYear() &&
+               date1.getMonth() === date2.getMonth() &&
+               date1.getDate() === date2.getDate();
+    }
 
     return (
         <div className="h-full w-full relative">
