@@ -82,7 +82,7 @@ const HomePage = () => {
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
                     <button
                         className="bg-green-800 bg-opacity-80 hover:bg-opacity-100 text-white hover:bg-green-800 shadow-lg text-lg px-8 py-4 rounded-lg transition-opacity duration-300"
-                        onClick={() => navigate('/application')}
+                        onClick={() => navigate('/animalmigration/application')}
                     >
                         Explore Gorongosa
                     </button>
@@ -100,15 +100,15 @@ const HomePage = () => {
                                 <h2 className="text-2xl font-bold mb-4">About</h2>
                                 <p className="text-gray-700 leading-relaxed">
                                     This mapping project was created by <strong> Ahmed Boutar</strong>, <strong>Tal Erez</strong>, <strong>Vihaan Nama</strong>, and
-                                    <strong> Lennox Anderson</strong> as part of a class project at Duke University. 
+                                    <strong> Lennox Anderson</strong> as part of a class project at Duke University.
                                     While the project was developed during their time at the university, the rights of the application belong solely to the creators.
-                                    
+
                                 </p>
                                 <p className="text-gray-700 leading-relaxed mt-4">
                                     The project focuses on predicting migration patterns of animals in Mozambique's Gorogonsa national park,
                                     leveraging decades of data and modern predictive analytics. The biggest obstacle to accurate mapping
-                                    of the different data points is the lack of data. In fact, animal sightings were performed only a few times each year, 
-                                    making a continuous mapping and animation a difficult task. 
+                                    of the different data points is the lack of data. In fact, animal sightings were performed only a few times each year,
+                                    making a continuous mapping and animation a difficult task.
                                 </p>
                             </section>
 
