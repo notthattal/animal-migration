@@ -83,12 +83,27 @@ Once you're done working, you can deactivate the virtual environment by running:
 
 
 ### To run the script
-Go into the Animal-Migration directory and run the pipeline.py file.
+The Scripts are organised as follows - 
+- animal-migration.py - Uses the best models for longitude, latitude, and number of animals seperately to genreate final predictions of data from 2023 to 2030.
+- script-lstm.py - Trains the LSTM model on all the data up until 2022. Uses the 2022 data as a testing set, obtains values such as MSE, MAE and R squared to evaluate the models.
+- multi_output_nn.py - Trains the multi output ensembled Neural Network model on all the data up until 2022. Uses the 2022 data as a testing set, obtains values such as MSE, MAE and R squared to evaluate the models.
+- non_dl.py - Trains the Non Deep Learning model - or the GradientBoostingRegressor on all the data up until 2022. Uses the 2022 data as a testing set, obtains values such as MSE, MAE and R squared to evaluate the models.
+
+Go into the Animal-Migration directory and run the animal-migration.py file to get the final predictions.
 
 The code to do so is - 
 ```sh
   cd /Animal-Migration
   python animal_migration.py
+```
+
+For Training predictions - 
+Run the script-lstm.py, multi_output_nn.py, and non_dl.py.
+```sh
+  cd /Animal-Migration
+  python script-lstm.py
+  python multi_output_nn.py
+  python non_dl.py
 ```
 
 ## Description of Data - 
