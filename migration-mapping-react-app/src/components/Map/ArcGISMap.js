@@ -22,26 +22,26 @@ const ArcGISMap = ({ locationData, timeRange }) => {
 
     
     const SPECIES_COLORS = {
-        'blueWildebeest': '#4F4F4F',    // Dark grey-blue
-        'buffalo': '#8B4513',           // Saddle brown
-        'bushbuck': '#8B7355',          // Light brown
-        'bushpig': '#FF9999',          // Pink-ish
-        'commonReedbuck': '#D2B48C',    // Tan
-        'duikerGrey': '#808080',        // Grey
-        'duikerRed': '#CD853F',         // Peru brown
-        'eland': '#DEB887',            // Burlywood
-        'elephant': '#696969',          // Dim grey
-        'hartebeest': '#B8860B',        // Dark golden rod
-        'hippo': '#778899',            // Light slate grey
-        'impala': '#CD853F',           // Peru brown
-        'kudu': '#A0522D',             // Sienna
-        'nyala': '#6B4423',            // Dark brown
-        'oribi': '#DAA520',            // Golden rod
-        'sable': '#2F4F4F',            // Dark slate grey
-        'warthog': '#8B7765',          // Rosy brown
-        'waterbuck': '#987654',        // Warm brown
-        'zebra': '#E5E4E2',            // Platinum (with hint of grey)
-        'default': '#FF0000'           // Red for unmatched species
+        'blueWildebeest': '#0E4D92',    // Deep blue
+        'buffalo': '#B22222',           // Firebrick red
+        'bushbuck': '#228B22',          // Forest green
+        'bushpig': '#FF6347',           // Tomato orange
+        'commonReedbuck': '#8A2BE2',    // Blue violet
+        'duikerGrey': '#4A4A4A',        // Dark charcoal grey
+        'duikerRed': '#FF4500',         // Orange red
+        'eland': '#00CED1',             // Dark turquoise
+        'elephant': '#4B0082',          // Indigo
+        'hartebeest': '#DAA520',        // Goldenrod yellow
+        'hippo': '#1E90FF',             // Dodger blue
+        'impala': '#FF1493',            // Deep pink
+        'kudu': '#2E8B57',              // Sea green
+        'nyala': '#9932CC',             // Dark orchid
+        'oribi': '#6495ED',             // Cornflower blue
+        'sable': '#D2691E',             // Chocolate brown-orange
+        'warthog': '#36454F',           // Charcoal blue-grey
+        'waterbuck': '#008080',         // Teal
+        'zebra': '#708090',             // Slate grey
+        'default': '#FF0000'            // Bright red for unmatched species
     };
     
     const getSpeciesColor = (species) => {
@@ -62,6 +62,55 @@ const ArcGISMap = ({ locationData, timeRange }) => {
         });
 
         view.current = mapView;
+
+        // Create a custom legend
+        const createLegend = () => {
+            // Create legend container
+            const legendContainer = document.createElement('div');
+            legendContainer.className = 'esri-legend esri-widget esri-widget--panel';
+            legendContainer.style.padding = '10px';
+            legendContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+            legendContainer.style.borderRadius = '4px';
+            legendContainer.style.maxWidth = '250px';
+
+            // Legend title
+            const legendTitle = document.createElement('h3');
+            legendTitle.textContent = 'Species';
+            legendTitle.style.marginBottom = '10px';
+            legendTitle.style.borderBottom = '1px solid #ccc';
+            legendContainer.appendChild(legendTitle);
+
+            // Create legend items
+            Object.entries(SPECIES_COLORS)
+                .filter(([species]) => species !== 'default')
+                .forEach(([species, color]) => {
+                    const legendItem = document.createElement('div');
+                    legendItem.style.display = 'flex';
+                    legendItem.style.alignItems = 'center';
+                    legendItem.style.marginBottom = '5px';
+
+                    // Color circle
+                    const colorBox = document.createElement('div');
+                    colorBox.style.width = '20px';
+                    colorBox.style.height = '20px';
+                    colorBox.style.backgroundColor = color;
+                    colorBox.style.marginRight = '10px';
+                    colorBox.style.borderRadius = '50%';
+
+                    // Species name
+                    const speciesName = document.createElement('span');
+                    speciesName.textContent = species
+                        .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+                        .replace(/^./, str => str.toUpperCase()); // Capitalize first letter
+
+                    legendItem.appendChild(colorBox);
+                    legendItem.appendChild(speciesName);
+                    legendContainer.appendChild(legendItem);
+                });
+
+            // Position the legend
+            mapView.ui.add(legendContainer, 'top-right');
+        };
 
         const graphicsLayer = new GraphicsLayer();
         map.add(graphicsLayer);
@@ -288,6 +337,11 @@ const ArcGISMap = ({ locationData, timeRange }) => {
         //     }
             
         // });
+
+        // Call create legend after map is loaded
+        mapView.when(() => {
+            createLegend();
+        });
 
         timeSlider.watch("timeExtent", (timeExtent) => {
             const currentDate = timeExtent.start;

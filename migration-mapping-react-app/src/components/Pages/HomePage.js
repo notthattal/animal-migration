@@ -99,15 +99,16 @@ const HomePage = () => {
                             <section>
                                 <h2 className="text-2xl font-bold mb-4">About</h2>
                                 <p className="text-gray-700 leading-relaxed">
-                                    The Mozambique Animal Migration Project was created by
-                                    <strong> Ahmed Boutar</strong>, <strong>Tal Erez</strong>, <strong>Vihaan Nama</strong>, and
-                                    <strong> Lennox Anderson</strong> during their research under Duke University. While the project
-                                    was developed during their time at the university, the rights of the application belong solely to
-                                    the creators.
+                                    This mapping project was created by <strong> Ahmed Boutar</strong>, <strong>Tal Erez</strong>, <strong>Vihaan Nama</strong>, and
+                                    <strong> Lennox Anderson</strong> as part of a class project at Duke University. 
+                                    While the project was developed during their time at the university, the rights of the application belong solely to the creators.
+                                    
                                 </p>
                                 <p className="text-gray-700 leading-relaxed mt-4">
-                                    The project focuses on predicting migration patterns of animals in Mozambique's wildlife sanctuaries,
-                                    leveraging decades of data and modern predictive analytics.
+                                    The project focuses on predicting migration patterns of animals in Mozambique's Gorogonsa national park,
+                                    leveraging decades of data and modern predictive analytics. The biggest obstacle to accurate mapping
+                                    of the different data points is the lack of data. In fact, animal sightings were performed only a few times each year, 
+                                    making a continuous mapping and animation a difficult task. 
                                 </p>
                             </section>
 
@@ -136,7 +137,7 @@ const HomePage = () => {
                                         <h3 className="text-xl font-semibold mb-2">Conservation Impact</h3>
                                         <p className="text-gray-700">
                                             By analyzing migration data, the project supports conservation efforts, helping preserve
-                                            Mozambique’s biodiversity and ensuring a sustainable future for its wildlife.
+                                            Gorogonsa's biodiversity and ensuring a sustainable future for its wildlife.
                                         </p>
                                     </div>
                                 </div>

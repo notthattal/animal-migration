@@ -7,7 +7,7 @@ const Navbar = () => {
       <nav className="bg-green-800 text-white p-4 flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <MapPin className="h-8 w-8" />
-          <h1 className="text-xl font-bold">Mozambique Wildlife Migration Tracker</h1>
+          <h1 className="text-xl font-bold">Gorogonsa Wildlife Tracker</h1>
         </div>
         <div className="flex space-x-4">
             <Link to="/" className="hover:text-green-200">Home</Link>
