@@ -188,7 +188,7 @@ def get_predictions(model, X_test, y_test=None):
     y_pred = model.predict(X_test)
 
     # print metrics for comparison against the actual values if they exist
-    if y_test:
+    if y_test is not None:
         print_metrics(y_test, pd.DataFrame(y_pred))
     
     return y_pred
@@ -211,3 +211,69 @@ def train_gb_model(X_train, y_train):
     model.fit(X_train, y_train)
 
     return model
+
+def main():
+    print('Reading in dataframe')
+    df = pd.read_excel('./data/GNP_Aerial_counting_1969_2022.xlsx') # read in the dataframe
+    print('Successfuly loaded dataframe')
+
+    print('Cleaning dataframe')
+    cleaned_df = clean_df(df) # pre-process the data
+    print('Cleaning complete')
+
+    # fill Nan values with the mean of the data
+    train_df = cleaned_df.fillna(cleaned_df.mean()) 
+
+    # create the training and test dataframes
+    test_df = train_df[train_df['COUNT'] == 2022]
+    train_df = train_df[train_df['COUNT'] != 2022]
+
+    # Split into inputs for the training and test set
+    X_train = train_df.drop(columns=['ID', 'LATITUDE', 'LONGITUDE', 'NUMBER'])
+    X_test = test_df.drop(columns=['ID', 'LATITUDE', 'LONGITUDE', 'NUMBER'])
+
+    # scale the input training data
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
+
+    # split the outputs for the number model
+    y_train = train_df['NUMBER']
+    y_test = test_df['NUMBER']
+
+    print('-' * 50)
+
+    # train the number model
+    print('Start number model training')
+    model = train_gb_model(X_train, y_train)
+
+    print('Metrics for number model')
+    get_predictions(model, X_test, y_test)
+    
+    print('-' * 50)
+    # split the outputs for the latitude model
+    y_train = train_df['LATITUDE']
+    y_test = test_df['LATITUDE']
+
+    # train the latitude model
+    print('Start latitude model training')
+    model = train_gb_model(X_train, y_train)
+
+    print('Metrics for latitude model')
+    get_predictions(model, X_test, y_test)
+
+    print('-' * 50)
+
+    # split the outputs for the longitude model
+    y_train = train_df['LONGITUDE']
+    y_test = test_df['LONGITUDE']
+
+    # train the longitude model
+    print('Start longitude model training')
+    model = train_gb_model(X_train, y_train)
+
+    print('Metrics for longitude model')
+    get_predictions(model, X_test, y_test)
+
+if __name__ == '__main__':
+    main()
