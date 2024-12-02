@@ -60,7 +60,6 @@ const HomePage = () => {
         <div className="min-h-screen bg-white">
             {/* Banner Section with Map */}
             <div className="relative h-[40vh] w-full bg-slate-100">
-                {/* Google Map */}
                 <GoogleMap
                     mapContainerStyle={mapContainerStyle}
                     center={center}
@@ -82,7 +81,7 @@ const HomePage = () => {
                 {/* Explore Button */}
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
                     <button
-                        className="bg-green-800 bg-opacity-70 hover:bg-opacity-100 text-white hover:bg-green-800 shadow-lg text-lg px-8 py-4 rounded-lg transition-opacity duration-300"
+                        className="bg-green-800 bg-opacity-80 hover:bg-opacity-100 text-white hover:bg-green-800 shadow-lg text-lg px-8 py-4 rounded-lg transition-opacity duration-300"
                         onClick={() => navigate('/application')}
                     >
                         Explore Gorongosa
@@ -100,11 +99,15 @@ const HomePage = () => {
                             <section>
                                 <h2 className="text-2xl font-bold mb-4">About</h2>
                                 <p className="text-gray-700 leading-relaxed">
-                                    Welcome to our research initiative in Gorongosa National Park, Mozambique.
-                                    Our team is dedicated to understanding and preserving the unique ecosystems
-                                    and wildlife of this remarkable park. Through collaborative efforts with
-                                    local communities and international partners, we strive to make a lasting
-                                    impact on conservation efforts in this biodiverse region.
+                                    The Mozambique Animal Migration Project was created by
+                                    <strong> Ahmed Boutar</strong>, <strong>Tal Erez</strong>, <strong>Vihaan Nama</strong>, and
+                                    <strong> Lennox Anderson</strong> during their research under Duke University. While the project
+                                    was developed during their time at the university, the rights of the application belong solely to
+                                    the creators.
+                                </p>
+                                <p className="text-gray-700 leading-relaxed mt-4">
+                                    The project focuses on predicting migration patterns of animals in Mozambique's wildlife sanctuaries,
+                                    leveraging decades of data and modern predictive analytics.
                                 </p>
                             </section>
 
@@ -113,30 +116,27 @@ const HomePage = () => {
                                 <h2 className="text-2xl font-bold mb-4">Research</h2>
                                 <div className="space-y-4">
                                     <div className="border-l-4 border-blue-500 pl-4">
-                                        <h3 className="text-xl font-semibold mb-2">Wildlife Conservation</h3>
+                                        <h3 className="text-xl font-semibold mb-2">Data-Driven Insights</h3>
                                         <p className="text-gray-700">
-                                            Our primary focus is on elephant population studies and habitat
-                                            preservation within Gorongosa National Park. Using cutting-edge technology
-                                            and traditional tracking methods, we monitor migration patterns and
-                                            behavior throughout the park's diverse landscapes.
+                                            The dataset spans from 1969 to the present and includes detailed field observations
+                                            digitized from maps. The predictions rely on advanced models to understand animal behavior
+                                            over decades.
                                         </p>
                                     </div>
 
                                     <div className="border-l-4 border-green-500 pl-4">
-                                        <h3 className="text-xl font-semibold mb-2">Community Engagement</h3>
+                                        <h3 className="text-xl font-semibold mb-2">Modeling Techniques</h3>
                                         <p className="text-gray-700">
-                                            Working closely with local communities around Gorongosa, we develop
-                                            sustainable conservation practices that benefit both wildlife and human
-                                            populations in and around the park.
+                                            Various machine learning techniques were explored, including GradientBoostingRegressor,
+                                            LSTMs, and ensemble models. These were tuned to achieve high accuracy in migration predictions.
                                         </p>
                                     </div>
 
                                     <div className="border-l-4 border-purple-500 pl-4">
-                                        <h3 className="text-xl font-semibold mb-2">Ecosystem Analysis</h3>
+                                        <h3 className="text-xl font-semibold mb-2">Conservation Impact</h3>
                                         <p className="text-gray-700">
-                                            Comprehensive studies of Gorongosa's ecosystem help us understand
-                                            the delicate balance between different species and their environment
-                                            within this unique African wilderness.
+                                            By analyzing migration data, the project supports conservation efforts, helping preserve
+                                            Mozambique’s biodiversity and ensuring a sustainable future for its wildlife.
                                         </p>
                                     </div>
                                 </div>
@@ -147,13 +147,11 @@ const HomePage = () => {
 
                 {/* Right Panel */}
                 <div className="bg-white rounded-lg shadow-lg relative">
-                    <div className="h-[60vh] w-full bg-slate-50 flex items-center justify-center rounded-lg">
-                        <img
-                            src={`https://lennoxanderson.com/migrationPicture.jpeg`}
-                            alt="Migration"
-                            className="h-full w-auto object-contain rounded-lg"
-                        />
-                    </div>
+                    <img
+                        src="https://lennoxanderson.com/migrationPicture.jpeg"
+                        alt="Animal Migration"
+                        className="h-[60vh] w-full object-cover rounded-lg"
+                    />
                 </div>
             </div>
         </div>
