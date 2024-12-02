@@ -28,18 +28,6 @@ const ApplicationPage = () => {
           ? speciesColumns[0].replace('SPECIES_', '') 
           : 'Unknown';
     }
-    
-    const SPECIES_COLORS = {
-        'blue wildebeast': '#1E90FF',
-        'buffalo': '#8B4513', 
-        'elephant': '#228B22',
-        // Add more species color mappings
-        'default': '#FF0000'
-    };
-    
-    const getSpeciesColor = (species) => {
-      return SPECIES_COLORS[species] || SPECIES_COLORS['default'];
-    }
 
     // Helper function to convert seconds after midnight to hours, minutes, seconds
     const getTimeFromSeconds = (secondsAfterMidnight) => {
@@ -222,6 +210,12 @@ const ApplicationPage = () => {
         if (window.ws?.readyState === WebSocket.OPEN) {
             window.ws.send(JSON.stringify(message));
             setTimeRange({ start: startDate, end: endDate });
+            // const filteredBySpecies = newFilters.species.length > 0
+            //     ? filteredData.filter(point => 
+            //         appliedFilters.species.includes(point.species)
+            //     )
+            //     : filteredData;
+            // setFilteredData(filteredBySpecies)
             // setIsLoading(false)
         } else {
             setError('WebSocket not connected');
@@ -278,6 +272,7 @@ const ApplicationPage = () => {
                 <ArcGISMap
                     locationData={filteredData}
                     timeRange={timeRange}
+                    selectedSpecies={appliedFilters.species}
                 />
             </div>
         </div>

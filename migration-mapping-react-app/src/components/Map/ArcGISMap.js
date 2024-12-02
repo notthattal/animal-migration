@@ -10,7 +10,7 @@ import DataProcessor from './DataProcessor';
 import TimeSlider from '@arcgis/core/widgets/TimeSlider';
 import './Map.css'
 
-const ArcGISMap = ({ locationData, timeRange }) => {
+const ArcGISMap = ({ locationData, timeRange, selectedSpecies }) => {
     const mapDiv = useRef(null);
     const view = useRef(null);
     const graphicsLayerRef = useRef(null);
@@ -20,6 +20,8 @@ const ArcGISMap = ({ locationData, timeRange }) => {
     const [customStops, setCustomStops] = useState([]);
     const [animatedData, setAnimatedData] = useState([]);
 
+
+    console.log('selectedSpecies: ', selectedSpecies)
     
     const SPECIES_COLORS = {
         'blueWildebeest': '#0E4D92',    // Deep blue
@@ -82,7 +84,7 @@ const ArcGISMap = ({ locationData, timeRange }) => {
 
             // Create legend items
             Object.entries(SPECIES_COLORS)
-                .filter(([species]) => species !== 'default')
+                .filter(([species]) => species !== 'default' && selectedSpecies.includes(species))
                 .forEach(([species, color]) => {
                     const legendItem = document.createElement('div');
                     legendItem.style.display = 'flex';
@@ -299,32 +301,36 @@ const ArcGISMap = ({ locationData, timeRange }) => {
             sortedDayPoints.forEach((point, index) => {
                 setTimeout(() => {
                     const species = getSpeciesName(point);
-                    const graphic = new Graphic({
-                        geometry: new Point({
-                            longitude: point.longitude,
-                            latitude: point.latitude
-                        }),
-                        symbol: {
-                            type: "simple-marker",
-                            color: getSpeciesColor(species),
-                            size: point.number * 2, // Size based on animal count
-                            outline: {
-                                color: "white",
-                                width: 1
+                    if (selectedSpecies.includes(species)) {
+                        const graphic = new Graphic({
+                            geometry: new Point({
+                                longitude: point.longitude,
+                                latitude: point.latitude
+                            }),
+                            symbol: {
+                                type: "simple-marker",
+                                color: getSpeciesColor(species),
+                                size: point.number * 2, // Size based on animal count
+                                outline: {
+                                    color: "white",
+                                    width: 1
+                                }
+                            },
+                            attributes: {
+                                species: species,
+                                count: point.number
                             }
-                        },
-                        attributes: {
-                            species: species,
-                            count: point.number
-                        }
-                    });
+                        });
+    
+                        graphicsLayer.add(graphic);
+                        // Remove point after an hour of display
+                        setTimeout(() => {
+                            graphicsLayer.remove(graphic);
+                        }, 1000); // 1 hour
+                    }
+                    
 
-                    graphicsLayer.add(graphic);
-
-                    // Remove point after an hour of display
-                    setTimeout(() => {
-                        graphicsLayer.remove(graphic);
-                    }, 1000); // 1 hour
+                    
 
                 }, index * 300); // 500ms between point displays
             });
