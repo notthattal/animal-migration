@@ -79,9 +79,9 @@ import React, { useState } from 'react';
 import { Filter, ChevronDown, Search, X } from 'lucide-react';
 
 const SPECIES_LIST = [
-  'blueWildebeest', 'buffalo', 'bushbuck', 'bushpig', 'commonReedbuck', 
-  'duikerGrey', 'duikerRed', 'eland', 'elephant', 'hartebeest', 
-  'hippo', 'impala', 'kudu', 'nyala', 'oribi', 
+  'blueWildebeest', 'buffalo', 'bushbuck', 'bushpig', 'commonReedbuck',
+  'duikerGrey', 'duikerRed', 'eland', 'elephant', 'hartebeest',
+  'hippo', 'impala', 'kudu', 'nyala', 'oribi',
   'sable', 'warthog', 'waterbuck', 'zebra'
 ];
 
@@ -93,7 +93,7 @@ const SidebarFilters = ({ onFilterChange }) => {
     startDate: '2023-01-01',
     endDate: '2024-12-01'
   });
-  
+
   const handleDateChange = (type, value) => {
     setDateRange(prev => ({
       ...prev,
@@ -102,8 +102,8 @@ const SidebarFilters = ({ onFilterChange }) => {
   };
 
   const toggleSpecies = (species) => {
-    setSelectedSpecies(prev => 
-      prev.includes(species) 
+    setSelectedSpecies(prev =>
+      prev.includes(species)
         ? prev.filter(s => s !== species)
         : [...prev, species]
     );
@@ -113,7 +113,7 @@ const SidebarFilters = ({ onFilterChange }) => {
     setSelectedSpecies([]);
   };
 
-  const filteredSpecies = SPECIES_LIST.filter(species => 
+  const filteredSpecies = SPECIES_LIST.filter(species =>
     species.toLowerCase().includes(speciesSearchTerm.toLowerCase())
   );
 
@@ -131,13 +131,13 @@ const SidebarFilters = ({ onFilterChange }) => {
       <div>
         <h3 className="font-medium mb-2">Species</h3>
         <div className="relative">
-          <button 
+          <button
             onClick={() => setIsSpeciesOpen(!isSpeciesOpen)}
             className="w-full p-2 border rounded flex justify-between items-center"
           >
             <span>
-              {selectedSpecies.length === 0 
-                ? 'Select Species' 
+              {selectedSpecies.length === 0
+                ? 'Select Species'
                 : `${selectedSpecies.length} species selected`}
             </span>
             <ChevronDown className="h-4 w-4" />
@@ -147,7 +147,7 @@ const SidebarFilters = ({ onFilterChange }) => {
             <div className="absolute z-10 w-full mt-1 border rounded shadow-lg bg-white">
               <div className="p-2 border-b flex items-center">
                 <Search className="h-4 w-4 mr-2 text-gray-500" />
-                <input 
+                <input
                   type="text"
                   placeholder="Search species..."
                   value={speciesSearchTerm}
@@ -158,13 +158,13 @@ const SidebarFilters = ({ onFilterChange }) => {
 
               <div className="max-h-60 overflow-y-auto">
                 {filteredSpecies.map(species => (
-                  <div 
+                  <div
                     key={species}
                     className={`p-2 hover:bg-gray-100 flex items-center cursor-pointer 
                       ${selectedSpecies.includes(species) ? 'bg-blue-50' : ''}`}
                     onClick={() => toggleSpecies(species)}
                   >
-                    <input 
+                    <input
                       type="checkbox"
                       checked={selectedSpecies.includes(species)}
                       onChange={() => {}}
@@ -176,13 +176,13 @@ const SidebarFilters = ({ onFilterChange }) => {
               </div>
 
               <div className="p-2 border-t flex justify-between items-center">
-                <button 
+                <button
                   onClick={clearSpeciesSelection}
                   className="text-red-500 hover:bg-red-50 p-1 rounded"
                 >
                   Clear
                 </button>
-                <button 
+                <button
                   onClick={() => setIsSpeciesOpen(false)}
                   className="bg-blue-500 text-white px-2 py-1 rounded"
                 >
@@ -195,13 +195,13 @@ const SidebarFilters = ({ onFilterChange }) => {
           {selectedSpecies.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1">
               {selectedSpecies.map(species => (
-                <span 
-                  key={species} 
+                <span
+                  key={species}
                   className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs flex items-center"
                 >
                   {species}
-                  <X 
-                    className="ml-1 h-3 w-3 cursor-pointer" 
+                  <X
+                    className="ml-1 h-3 w-3 cursor-pointer"
                     onClick={() => toggleSpecies(species)}
                   />
                 </span>

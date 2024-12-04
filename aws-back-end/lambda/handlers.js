@@ -116,10 +116,10 @@ exports.messageHandler = async (event) => {
                 };
             })
             .filter(record => {
-                return record.year >= startYear &&
-                    record.year <= endYear &&
-                    record.month >= startMonth &&
-                    record.month <= endMonth;
+                const recordDate = (record.year * 12) + record.month;
+                const startDate = (startYear * 12) + startMonth;
+                const endDate = (endYear * 12) + endMonth;
+                return recordDate >= startDate && recordDate <= endDate;
             });
 
         console.log(`Found ${parsedData.length} matching records`);

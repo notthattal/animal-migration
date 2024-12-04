@@ -190,38 +190,89 @@ const ApplicationPage = () => {
         }));
 
         console.log('Applying filters:', newFilters);
-        setFilteredData([]); // Clear existing data
+        setFilteredData([]);
         setRawLocationData([]);
         setIsLoading(true);
 
-        const startDate = new Date(newFilters.startDate);
-        const endDate = new Date(newFilters.endDate);
+        // Parse the dates
+        const startParts = newFilters.startDate.split('-');
+        const endParts = newFilters.endDate.split('-');
 
-        console.log('Date range:', { startDate, endDate });
+        // Convert to numbers and adjust to 0-based months
+        const startYear = parseInt(startParts[0]);
+        const startMonth = parseInt(startParts[1]) - 1;  // Convert to 0-based
+        const endYear = parseInt(endParts[0]);
+        const endMonth = parseInt(endParts[1]) - 1;  // Convert to 0-based
+
+        // For December, we need to adjust the end month to be 0 (January) and increment the year
+        let adjustedEndMonth = endMonth;
+        let adjustedEndYear = endYear;
+        if (endMonth === 11) {  // If December
+            adjustedEndMonth = 0;  // Set to January
+            adjustedEndYear = endYear + 1;  // Increment year
+        }
 
         const message = {
             action: 'sendmessage',
-            startYear: startDate.getFullYear(),
-            startMonth: startDate.getMonth() + 1,
-            endYear: endDate.getFullYear(),
-            endMonth: endDate.getMonth() + 1
+            startYear: startYear,
+            startMonth: startMonth,
+            endYear: adjustedEndYear,
+            endMonth: adjustedEndMonth
         };
+
+        console.log('WebSocket message being sent:', message);
 
         if (window.ws?.readyState === WebSocket.OPEN) {
             window.ws.send(JSON.stringify(message));
-            setTimeRange({ start: startDate, end: endDate });
-            // const filteredBySpecies = newFilters.species.length > 0
-            //     ? filteredData.filter(point => 
-            //         appliedFilters.species.includes(point.species)
-            //     )
-            //     : filteredData;
-            // setFilteredData(filteredBySpecies)
-            // setIsLoading(false)
+            setTimeRange({
+                start: new Date(startYear, startMonth, 1),
+                end: new Date(endYear, endMonth, 1)  // Note: using original end date for display
+            });
         } else {
             setError('WebSocket not connected');
             setIsLoading(false);
         }
     };
+
+    // const handleFilterChange = (newFilters) => {
+    //     setAppliedFilters(prevFilters => ({
+    //         ...prevFilters,
+    //         ...newFilters
+    //     }));
+    //
+    //     console.log('Applying filters:', newFilters);
+    //     setFilteredData([]); // Clear existing data
+    //     setRawLocationData([]);
+    //     setIsLoading(true);
+    //
+    //     const startDate = new Date(newFilters.startDate);
+    //     const endDate = new Date(newFilters.endDate);
+    //
+    //     console.log('Date range:', { startDate, endDate });
+    //
+    //     const message = {
+    //         action: 'sendmessage',
+    //         startYear: startDate.getFullYear(),
+    //         startMonth: startDate.getMonth() + 1,
+    //         endYear: endDate.getFullYear(),
+    //         endMonth: endDate.getMonth() + 1
+    //     };
+    //
+    //     if (window.ws?.readyState === WebSocket.OPEN) {
+    //         window.ws.send(JSON.stringify(message));
+    //         setTimeRange({ start: startDate, end: endDate });
+    //         // const filteredBySpecies = newFilters.species.length > 0
+    //         //     ? filteredData.filter(point =>
+    //         //         appliedFilters.species.includes(point.species)
+    //         //     )
+    //         //     : filteredData;
+    //         // setFilteredData(filteredBySpecies)
+    //         // setIsLoading(false)
+    //     } else {
+    //         setError('WebSocket not connected');
+    //         setIsLoading(false);
+    //     }
+    // };
 
     const toggleSidebar = () => {
         setFiltersVisible(!filtersVisible);
